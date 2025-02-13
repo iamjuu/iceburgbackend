@@ -1,23 +1,36 @@
-const Product = require("../Model/product");
+const product = require("../Model/product");
 
 module.exports = {
-    Productadd: async (req, res) => {
-        try {
-            const { name, price } = req.body;
-            const img = req.file?.path; // Ensure correct file path handling
+    addProduct: async (req, res) => {
+      try {
     
-            if (!name || !price || !img) {
-                return res.status(400).json({ message: "All fields are required" });
-            }
-    
-            const productData = new Product({ name, price, img });
-            await productData.save();
-    
-            res.status(201).json({ message: "Product added successfully", product: productData });
-        } catch (error) {
-            console.error("Error adding product:", error);
-            res.status(500).json({ message: "Internal Server Error" });
+        
+        const { name, price } = req.body;
+                if (!req.file) {
+          return res.status(400).json({
+            message: "Product image is required"
+          });
         }
+          const imgPath = '/public/' + req.file.filename;
+          const productData = new product({
+          name,
+          price,
+          img: imgPath
+        });  
+        await productData.save();
+        res.status(201).json({
+          success: true,
+          message: "Product added successfully",
+          product
+        });
+        console.log('product saved');
+      } catch (error) {
+        console.error('Error in addProduct:', error);
+        res.status(500).json({
+          success: false,
+          message: error.message || "Error adding product"
+        });
+      }
     },
     
     productDelete: async (req, res) => {
@@ -28,7 +41,7 @@ module.exports = {
                 return res.status(400).json({ message: "Product ID is required" });
             }
     
-            const deletedProduct = await Product.findByIdAndDelete(id);
+            const deletedProduct = await product.findByIdAndDelete(id);
     
             if (!deletedProduct) {
                 return res.status(404).json({ message: "Product not found" });
@@ -57,7 +70,7 @@ module.exports = {
             if (price) updateData.price = price;
             if (img) updateData.img = img;
     
-            const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true });
+            const updatedProduct = await product.findByIdAndUpdate(id, updateData, { new: true });
     
             if (!updatedProduct) {
                 return res.status(404).json({ message: "Product not found" });
@@ -69,13 +82,13 @@ module.exports = {
             res.status(500).json({ message: "Internal Server Error" });
         }
     },
-    productGet :(req,res)=>{
+    productGet :async(req,res)=>{
         try {
-            const Data = Product.find()
+            const Data = await product.find()
             res.status(200).json({Data:Data})
         } catch (error) {
             console.log(error,'err in product fatahing');
             
         }
     }
-    };
+    }

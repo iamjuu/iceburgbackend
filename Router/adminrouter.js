@@ -3,9 +3,9 @@ const Router = express.Router()
 const Product = require('../Controller/adminController')
 const upload = require('../utils/multer')
 
-Router.post('/add-product',upload.single('image'),Product.Productadd)
+Router.post('/addproduct',upload.single('image'),Product.addProduct)
 Router.delete('delete-Product',Product.productDelete)
 Router.put('/edit-Product',Product.productEdit)
-Router.get('/products',Product.productGet)
+Router.get('/getproduct',Product.productGet)
 
 module.exports = Router
